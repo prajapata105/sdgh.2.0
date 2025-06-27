@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "501513723972",
+    "project_id": "sdgh-one",
+    "storage_bucket": "sdgh-one.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:501513723972:android:58d287d0df1b9d27671c11",
+        "android_client_info": {
+          "package_name": "com.example.ssda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxiLYJNJR8WOKo8soTO41h-Zd9DxtB7p0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
