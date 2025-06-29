@@ -27,7 +27,7 @@ class AppAuthProvider {
     String phone = cred.user!.phoneNumber!;
     wooUserId = await WooUserMapper.mapFirebaseToWooUser(phone: firebaseUid, name: phone);
     await box.write('wooUserId', wooUserId);
-    await NotificationService().refreshTokenAndSendToServer();
+
 
   }
 

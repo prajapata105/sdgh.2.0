@@ -37,6 +37,11 @@
                 <!-- यहाँ पर अपनी वेबसाइट का डोमेन डालें -->
                 <data android:scheme="https" android:host="sridungargarhone.com" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="FLUTTER_NOTIFICATION_CLICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <meta-data

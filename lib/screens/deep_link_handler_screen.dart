@@ -57,7 +57,7 @@ class _DeepLinkHandlerScreenState extends State<DeepLinkHandlerScreen> {
     if (productIdString != null) {
       final productId = int.tryParse(productIdString);
       if (productId != null) {
-        // आवश्यकता 1: प्रोडक्ट के लिए लॉगिन जांचें
+
         if (isLoggedIn) {
           final Product? product = await ProductService.getProductById(productId);
           if (mounted && product != null) {
@@ -66,7 +66,8 @@ class _DeepLinkHandlerScreenState extends State<DeepLinkHandlerScreen> {
             if (Get.context != null) openProductDescription(Get.context!, product);
             return;
           }
-        } else {
+        }
+        else {
           // अगर लॉग इन नहीं है, तो लॉगिन स्क्रीन दिखाएं
           Get.offAllNamed('/login-mobile-number');
           return;

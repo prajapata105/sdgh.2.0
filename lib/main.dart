@@ -15,12 +15,27 @@ import 'package:ssda/services/cart_service.dart';
 import 'package:ssda/Services/Providers/custom_auth_provider.dart';
 import 'package:ssda/ui/widgets/common/no_internet_widget.dart';
 
+import 'Services/notification_service.dart';
+
 Future<void> main() async {
+  // डीबगिंग के लिए प्रिंट स्टेटमेंट्स
+  print("DEBUG: main() function started.");
   WidgetsFlutterBinding.ensureInitialized();
+
+  print("DEBUG: Firebase.initializeApp() is starting...");
   await Firebase.initializeApp();
+  print("DEBUG: Firebase.initializeApp() is complete.");
+
+  print("DEBUG: GetStorage.init() is starting...");
   await GetStorage.init();
+  print("DEBUG: GetStorage.init() is complete.");
+
+  print("DEBUG: NotificationService().initialize() is starting...");
+  await NotificationService().initialize();
+  print("DEBUG: NotificationService().initialize() is complete.");
 
   // Controllers/services initialization
+  print("DEBUG: Initializing GetX controllers...");
   Get.put(NetworkController(), permanent: true);
   Get.put(CartService(), permanent: true);
   Get.put(AddressController(), permanent: true);
@@ -29,8 +44,9 @@ Future<void> main() async {
   Get.put(OrderDetailsController(), permanent: true);
   Get.put(AppAuthProvider(), permanent: true);
   Get.put(HomeController(), permanent: true);
- // await Get.putAsync(() async => AppAuthProvider()); // AppAuthProvider inject करो
+  print("DEBUG: GetX controllers initialized.");
 
+  print("DEBUG: Running the app...");
   runApp(const MyApp());
 }
 
