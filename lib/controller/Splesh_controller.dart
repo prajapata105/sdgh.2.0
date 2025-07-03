@@ -1,13 +1,9 @@
-// lib/controller/Splesh_controller.dart - पूरा अंतिम कोड
-
 import 'dart:async';
-
 import 'package:get/get.dart';
-import 'package:app_links/app_links.dart'; // <<<--- यह इम्पोर्ट ज़रूरी है
+import 'package:app_links/app_links.dart';
 import 'package:ssda/Services/Providers/custom_auth_provider.dart';
-import 'package:ssda/screens/intro-screen/homenav.dart';
-import 'package:ssda/screens/intro-screen/login-mobile-number.dart';
-
+import 'package:ssda/Services/notification_service.dart';
+// 'route_generator.dart' का इम्पोर्ट यहाँ ज़रूरी नहीं है
 
 class SplashController extends GetxController {
   final _appLinks = AppLinks();
@@ -18,25 +14,42 @@ class SplashController extends GetxController {
     _handleStartup();
   }
 
+  // ▼▼▼ इस फंक्शन को इस फाइनल संस्करण से बदल दें ▼▼▼
   Future<void> _handleStartup() async {
-    // ऐप शुरू होते ही जांचें कि क्या यह डीप लिंक से खुली है।
-    final initialUri = await _appLinks.getInitialLink();
+    // 1. सबसे पहले जांचें कि ऐप किसी नोटिफिकेशन पर क्लिक करके लॉन्च हुआ है या नहीं (यह सही है)
+    final notificationService = Get.find<NotificationService>();
+    final String? notificationPath = await notificationService.getPathFromLaunchNotification();
 
-    // अगर initialUri null है, इसका मतलब है कि यह एक सामान्य स्टार्ट है।
-    // तभी टाइमर वाला लॉजिक चलाएं।
-    if (initialUri == null) {
-      // यह एक सामान्य स्टार्ट है।
-      Timer(const Duration(seconds: 3), () {
-        final authProvider = Get.find<AppAuthProvider>();
-        if (authProvider.isUserLoggedIn) {
-          Get.offAllNamed('/homenav');
-        } else {
-          Get.offAllNamed('/login-mobile-number');
-        }
-      });
+    if (notificationPath != null && notificationPath.isNotEmpty) {
+      Get.offAllNamed(notificationPath);
+      return;
     }
-    // अगर initialUri null नहीं है, तो इसका मतलब है कि AppRouter और
-    // DeepLinkHandlerScreen अपना काम कर रहे हैं।
-    // तो SplashController को कुछ भी करने की ज़रूरत नहीं है।
+
+    // 2. अगर नोटिफिकेशन लिंक नहीं है, तो वेबसाइट (यूनिवर्सल) लिंक की जांच करें
+    final initialUri = await _appLinks.getInitialLink();
+    if (initialUri != null) {
+      // URI से पूरा पाथ (जैसे "/?p=123") बनाएँ
+      String path = initialUri.path;
+      if (initialUri.hasQuery) {
+        path += '?${initialUri.query}';
+      }
+
+      // पूरे पाथ को GetX को पास करें।
+      // अब आपका AppRouter इसे पकड़ेगा और DeepLinkHandlerScreen पर भेजेगा।
+      print("--- Website link found: $path. Passing to AppRouter. ---");
+      Get.offAllNamed(path);
+      return;
+    }
+
+    // 3. अगर कोई डीप लिंक नहीं है, तो सामान्य रूप से ऐप शुरू करें
+    Timer(const Duration(seconds: 3), () {
+      final authProvider = Get.find<AppAuthProvider>();
+      if (authProvider.isUserLoggedIn) {
+        Get.offAllNamed('/homenav');
+      } else {
+        Get.offAllNamed('/login-mobile-number');
+      }
+    });
   }
+// ▲▲▲ फंक्शन यहाँ समाप्त होता है ▲▲▲
 }

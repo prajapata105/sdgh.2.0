@@ -29,9 +29,9 @@ class _HomeNavState extends State<HomeNav> {
 
   List widgets = <Widget>[
     FirstPage(),
+    NewsListScreen(),
     SearchScreen(),
     HomeScreen(),
-    NewsListScreen()
   ];
 
   @override
@@ -106,12 +106,12 @@ class _HomeNavState extends State<HomeNav> {
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 3.0),
                 child: SvgPicture.asset(
-                  'assets/imagesvg/agro.svg',
+                  'assets/imagesvg/shopx.svg',
                   width: 20,
                   color: _index == 3 ? kPrimaryColor : kTitleColor,
                 ),
               ),
-              label: "मंडी भाव",
+              label: "Shop",
             ),
           ],
         ),

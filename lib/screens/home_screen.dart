@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
     final HomeController homeController = Get.find<HomeController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xffF9F9F9),
+      backgroundColor: kBackgroundColor,
       body: Stack(
         children: [
           RefreshIndicator(
@@ -108,7 +108,7 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Container(
           height: 250,
-          width: double.infinity,
+          width: 250,
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12)

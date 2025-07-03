@@ -10,11 +10,10 @@ import 'package:get/get.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print("--- BACKGROUND HANDLER TRIGGERED ---");
   await NotificationService().showNotificationFromData(message.data);
 }
 
-class NotificationService {
+class NotificationService extends GetxService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
@@ -27,7 +26,29 @@ class NotificationService {
     await FirebaseMessaging.instance.requestPermission();
     await FirebaseMessaging.instance.subscribeToTopic('all_updates');
     _setupMessageHandlers();
-    _handleTerminatedStateNotification();
+  }
+
+
+
+  Future<String?> getPathFromLaunchNotification() async {
+    final NotificationAppLaunchDetails? launchDetails =
+    await _localNotifications.getNotificationAppLaunchDetails();
+
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      final String? payload = launchDetails!.notificationResponse?.payload;
+      if (payload != null && payload.isNotEmpty) {
+        try {
+          final Map<String, dynamic> data = jsonDecode(payload);
+          final String? path = data['click_action'];
+          print("--- App launched from terminated state via local notification. Path: $path ---");
+          return path;
+        } catch (e) {
+          print('Error decoding notification payload: $e');
+          return null;
+        }
+      }
+    }
+    return null;
   }
 
   Future<void> _ensureLocalNotificationsInitialized() async {
@@ -50,7 +71,6 @@ class NotificationService {
 
   void _setupMessageHandlers() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Foreground message received: ${message.data}");
       showNotificationFromData(message.data);
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -59,29 +79,34 @@ class NotificationService {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
-  void _handleTerminatedStateNotification() async {
+  // ▼▼▼ यहाँ बदलाव किया गया है ▼▼▼
+  // यह फंक्शन अब सिर्फ लिंक का पता लौटाएगा
+  Future<String?> getInitialMessagePath() async {
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      _handleNotificationClick(initialMessage.data);
+      print("--- Path from terminated notification: ${initialMessage.data['click_action']} ---");
+      return initialMessage.data['click_action'];
+    }
+    return null;
+  }
+  // ▲▲▲ यहाँ बदलाव किया गया है ▲▲▲
+
+  // यह फंक्शन अब भी बैकग्राउंड/फोरग्राउंड क्लिक को हैंडल करेगा
+  void _handleNotificationClick(Map<String, dynamic> data) {
+    final String? path = data['click_action'];
+    if (path != null && path.isNotEmpty) {
+      print("Deep Link Navigation via Notification: Navigating to $path");
+      Get.toNamed(path);
     }
   }
 
-  Future<String> _downloadAndSaveFile(String url, String fileName) async {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    final String filePath = '${directory.path}/$fileName';
-    final http.Response response = await http.get(Uri.parse(url));
-    final File file = File(filePath);
-    await file.writeAsBytes(response.bodyBytes);
-    return filePath;
-  }
-
   Future<void> showNotificationFromData(Map<String, dynamic> data) async {
+    // ... (यह फंक्शन वैसा ही रहेगा)
     await _ensureLocalNotificationsInitialized();
     final String? title = data['title'];
     final String? body = data['body'];
     final String? imageUrl = data['image'];
     StyleInformation? styleInformation;
-
     if (imageUrl != null && imageUrl.isNotEmpty) {
       try {
         final String imagePath = await _downloadAndSaveFile(imageUrl, 'notification_image.jpg');
@@ -93,35 +118,29 @@ class NotificationService {
           summaryText: body,
           htmlFormatSummaryText: true,
         );
-      } catch (e) {
-        print('Error downloading image for notification: $e');
-      }
+      } catch (e) { print('Error downloading image: $e'); }
     }
-
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'high_importance_channel',
-      'High Importance Notifications',
+      'high_importance_channel', 'High Importance Notifications',
       channelDescription: 'This channel is used for important notifications.',
-      importance: Importance.max,
-      priority: Priority.high,
+      importance: Importance.max, priority: Priority.high,
       styleInformation: styleInformation,
     );
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(presentSound: true);
     final NotificationDetails platformDetails = NotificationDetails(android: androidDetails, iOS: iosDetails);
-
     await _localNotifications.show(
       DateTime.now().millisecondsSinceEpoch.toUnsigned(31),
-      title,
-      body,
-      platformDetails,
+      title, body, platformDetails,
       payload: jsonEncode(data),
     );
   }
 
-  void _handleNotificationClick(Map<String, dynamic> data) {
-    final String? path = data['click_action'];
-    if (path != null && path.isNotEmpty) {
-      Get.toNamed(path);
-    }
+  Future<String> _downloadAndSaveFile(String url, String fileName) async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final String filePath = '${directory.path}/$fileName';
+    final http.Response response = await http.get(Uri.parse(url));
+    final File file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+    return filePath;
   }
 }

@@ -14,28 +14,18 @@ import 'package:ssda/services/OrderService.dart';
 import 'package:ssda/services/cart_service.dart';
 import 'package:ssda/Services/Providers/custom_auth_provider.dart';
 import 'package:ssda/ui/widgets/common/no_internet_widget.dart';
-
 import 'Services/notification_service.dart';
 
 Future<void> main() async {
-  // डीबगिंग के लिए प्रिंट स्टेटमेंट्स
-  print("DEBUG: main() function started.");
   WidgetsFlutterBinding.ensureInitialized();
-
-  print("DEBUG: Firebase.initializeApp() is starting...");
   await Firebase.initializeApp();
-  print("DEBUG: Firebase.initializeApp() is complete.");
-
-  print("DEBUG: GetStorage.init() is starting...");
   await GetStorage.init();
-  print("DEBUG: GetStorage.init() is complete.");
 
-  print("DEBUG: NotificationService().initialize() is starting...");
-  await NotificationService().initialize();
-  print("DEBUG: NotificationService().initialize() is complete.");
+  // NotificationService को GetX में डालें ताकि कहीं से भी मिल सके
+  final notificationService = Get.put(NotificationService(), permanent: true);
+  await notificationService.initialize();
 
   // Controllers/services initialization
-  print("DEBUG: Initializing GetX controllers...");
   Get.put(NetworkController(), permanent: true);
   Get.put(CartService(), permanent: true);
   Get.put(AddressController(), permanent: true);
@@ -44,12 +34,11 @@ Future<void> main() async {
   Get.put(OrderDetailsController(), permanent: true);
   Get.put(AppAuthProvider(), permanent: true);
   Get.put(HomeController(), permanent: true);
-  print("DEBUG: GetX controllers initialized.");
 
-  print("DEBUG: Running the app...");
   runApp(const MyApp());
 }
 
+// ▼▼▼ MyApp अब फिर से एक StatelessWidget है ▼▼▼
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
