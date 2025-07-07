@@ -39,7 +39,6 @@ class HomeScreen extends StatelessWidget {
 
                   SliverToBoxAdapter(
                     child: Container(
-
                       padding: const EdgeInsets.all(16),
                       margin:  EdgeInsets.all(6.0),
                       decoration: const BoxDecoration(
@@ -91,14 +90,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-        child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-    );
-  }
+
 
   Widget _buildProductShimmer() {
     return Shimmer.fromColors(

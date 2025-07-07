@@ -28,17 +28,19 @@ class HomeScreenCarousel extends StatelessWidget {
           child: CarouselSlider.builder(
             itemCount: controller.carouselBanners.length,
             itemBuilder: (context, index, realIndex) {
+
               final banner = controller.carouselBanners[index];
               return GestureDetector(
                 onTap: () => controller.handleBannerTap(context, banner.link),
                 child: Container(
                   width: Get.width,
                   margin: const EdgeInsets.symmetric(horizontal: 5.0),
+
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
                       banner.imageUrl,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                       errorBuilder: (context, error, stackTrace) {
                         return const Icon(Icons.broken_image, size: 50, color: Colors.grey);
                       },

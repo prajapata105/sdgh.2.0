@@ -6,9 +6,10 @@ import 'package:ssda/constants.dart';
 import 'package:ssda/models/cart_item_model.dart';
 import 'package:ssda/models/product_model.dart';
 import 'package:ssda/services/cart_service.dart';
-import 'package:share_plus/share_plus.dart'; // <<<--- शेयर पैकेज
+import 'package:share_plus/share_plus.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-// यह एक हेल्पर फंक्शन है जो बॉटम शीट को खोलता है
+// यह हेल्पर फंक्शन वैसा ही रहेगा
 void openProductDescription(BuildContext context, Product product) {
   showModalBottomSheet(
     context: context,
@@ -19,7 +20,7 @@ void openProductDescription(BuildContext context, Product product) {
     ),
     builder: (context) => DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.7, // शुरुआती ऊंचाई थोड़ी बढ़ाई गई
+      initialChildSize: 0.7,
       maxChildSize: 0.9,
       minChildSize: 0.4,
       builder: (context, scrollController) =>
@@ -39,9 +40,62 @@ class ProductDescriptionModal extends StatelessWidget {
     return document.body?.text ?? '';
   }
 
+  // ======================= नया फंक्शन: इमेज पॉपअप दिखाने के लिए =======================
+  void _showImagePopup(BuildContext context, {required int initialIndex}) {
+    final pageController = PageController(initialPage: initialIndex);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(10),
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              // ज़ूम करने योग्य इमेज व्यूअर
+              PageView.builder(
+                controller: pageController,
+                itemCount: product.images.length,
+                itemBuilder: (context, index) {
+                  return InteractiveViewer(
+                    panEnabled: true,
+                    minScale: 0.5,
+                    maxScale: 4.0,
+                    child: Image.network(
+                      product.images[index],
+                      fit: BoxFit.contain,
+                    ),
+                  );
+                },
+              ),
+              // पॉपअप बंद करने का बटन
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  icon: const CircleAvatar(
+                    backgroundColor: Colors.black54,
+                    child: Icon(Icons.close, color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  // ======================= फंक्शन यहाँ समाप्त होता है =======================
+
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final imagePageController = PageController();
 
     return Container(
       decoration: const BoxDecoration(
@@ -50,7 +104,6 @@ class ProductDescriptionModal extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // ड्रैग हैंडल
           Container(
             height: 5,
             width: 40,
@@ -60,24 +113,65 @@ class ProductDescriptionModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
             ),
           ),
-          // स्क्रॉल होने वाला कंटेंट
           Expanded(
             child: ListView(
               controller: scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
-                // प्रोडक्ट इमेज
+                // इमेज स्लाइडर
                 SizedBox(
-                  height: Get.height * 0.25,
-                  child: product.image.isNotEmpty
-                      ? Image.network(product.image, fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.broken_image_outlined, size: 100, color: Colors.grey),
-                  )
-                      : const Icon(Icons.image_not_supported_outlined, size: 100, color: Colors.grey),
+                  height: Get.height * 0.3,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: imagePageController,
+                          itemCount: product.images.isEmpty ? 1 : product.images.length,
+                          itemBuilder: (context, index) {
+                            if (product.images.isEmpty) {
+                              return const Icon(Icons.image_not_supported_outlined, size: 100, color: Colors.grey);
+                            }
+                            final imageUrl = product.images[index];
+
+                            // 👇====== इमेज पर क्लिक करने के लिए GestureDetector ======👇
+                            return GestureDetector(
+                              onTap: () {
+                                _showImagePopup(context, initialIndex: index);
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.broken_image_outlined, size: 100, color: Colors.grey),
+                                ),
+                              ),
+                            );
+                            // 👆=====================================================👆
+                          },
+                        ),
+                      ),
+                      if (product.images.length > 1)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: SmoothPageIndicator(
+                            controller: imagePageController,
+                            count: product.images.length,
+                            effect: WormEffect(
+                              dotHeight: 9,
+                              dotWidth: 9,
+                              activeDotColor: AppColors.primaryGreenColor,
+                              dotColor: Colors.grey.shade300,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
+
                 const SizedBox(height: 20),
 
-                // <<<--- बदलाव यहाँ: टाइटल और शेयर बटन के लिए Row ---<<<
+                // टाइटल और शेयर बटन
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,22 +202,20 @@ class ProductDescriptionModal extends StatelessWidget {
                     _parseHtmlString(product.description),
                     style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey[700], height: 1.5),
                   ),
-                const SizedBox(height: 100), // नीचे के बटन के लिए जगह
+                const SizedBox(height: 100),
               ],
             ),
           ),
-          // बॉटम बार जो हमेशा दिखेगा
           _buildBottomBar(theme),
         ],
       ),
     );
   }
 
-  // कीमत और ऐड टू कार्ट बटन के लिए बॉटम बार
   Widget _buildBottomBar(ThemeData theme) {
     final double priceAsDouble = double.tryParse(product.price) ?? 0.0;
     final double regularPriceAsDouble = double.tryParse(product.regularPrice) ?? 0.0;
-    final bool onSale = product.onSale && regularPriceAsDouble > priceAsDouble;
+    final bool onSale = product.onSale && regularPriceAsDouble > 0 && regularPriceAsDouble > priceAsDouble;
 
     return Container(
       padding: EdgeInsets.fromLTRB(20, 15, 20, Get.mediaQuery.padding.bottom + 15),
@@ -159,19 +251,16 @@ class ProductDescriptionModal extends StatelessWidget {
             ),
           ),
           SizedBox(width: Get.width * 0.04),
-          // <<<--- बदलाव यहाँ: नया कार्ट कंट्रोल विजेट ---<<<
           _buildCartControls(),
         ],
       ),
     );
   }
 
-  // यह विजेट ADD और +/- बटन दोनों को मैनेज करेगा
   Widget _buildCartControls() {
     final CartService cartService = Get.find();
     return Obx(() {
       final cartItem = cartService.cartItems.firstWhereOrNull((item) => item.id == product.id);
-
       if (cartItem == null) {
         return _buildAddButton(cartService);
       } else {
@@ -180,13 +269,15 @@ class ProductDescriptionModal extends StatelessWidget {
     });
   }
 
-  // ADD बटन
   Widget _buildAddButton(CartService cartService) {
     return ElevatedButton(
       onPressed: () {
         final newItem = CartItem(
-          id: product.id, title: product.name, imageUrl: product.image,
-          price: double.tryParse(product.price) ?? 0.0, quantity: 1,
+          id: product.id,
+          title: product.name,
+          imageUrl: product.image,
+          price: double.tryParse(product.price) ?? 0.0,
+          quantity: 1,
         );
         cartService.addToCart(newItem);
       },
@@ -200,7 +291,6 @@ class ProductDescriptionModal extends StatelessWidget {
     );
   }
 
-  // क्वांटिटी (+/-) कंट्रोलर
   Widget _buildQuantitySelector(CartService cartService, CartItem item) {
     return Container(
       height: 48,
@@ -213,16 +303,13 @@ class ProductDescriptionModal extends StatelessWidget {
         children: [
           IconButton(
               onPressed: () => cartService.updateQuantity(item, item.quantity - 1),
-              icon: const Icon(Icons.remove, color: Colors.white)
-          ),
-          Text(
-              '${item.quantity}',
-              style: Get.theme.textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)
-          ),
+              icon: const Icon(Icons.remove, color: Colors.white)),
+          Text('${item.quantity}',
+              style: Get.theme.textTheme.titleLarge
+                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
           IconButton(
               onPressed: () => cartService.updateQuantity(item, item.quantity + 1),
-              icon: const Icon(Icons.add, color: Colors.white)
-          ),
+              icon: const Icon(Icons.add, color: Colors.white)),
         ],
       ),
     );

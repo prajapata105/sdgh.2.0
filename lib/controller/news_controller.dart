@@ -1,3 +1,5 @@
+// lib/controller/news_controller.dart
+
 import 'package:get/get.dart';
 import 'package:ssda/models/news_article_model.dart';
 import 'package:ssda/services/news_service.dart';
@@ -6,7 +8,11 @@ import 'package:html/parser.dart';
 
 class NewsController extends GetxController {
   var isLoading = true.obs;
-  var articles = <NewsArticle>[].obs;
+  var allArticles = <NewsArticle>[].obs;
+
+  // UI के लिए नई RxLists
+  var topBannerArticles = <NewsArticle>[].obs;
+  var otherArticles = <NewsArticle>[].obs;
 
   @override
   void onInit() {
@@ -17,14 +23,24 @@ class NewsController extends GetxController {
   void fetchNews() async {
     try {
       isLoading(true);
-      articles.value = await NewsService.getNewsArticles();
+      allArticles.value = await NewsService.getNewsArticles();
+
+      // खबरों को दो हिस्सों में बांटें
+      if (allArticles.length >= 5) {
+        topBannerArticles.value = allArticles.sublist(0, 5); // पहली 5 खबरें
+        otherArticles.value = allArticles.sublist(5);      // बाकी की खबरें
+      } else {
+        // अगर 5 से कम खबरें हैं, तो सभी को बैनर में दिखाएं
+        topBannerArticles.value = allArticles;
+        otherArticles.clear();
+      }
     } finally {
       isLoading(false);
     }
   }
 }
 
-// यह कंट्रोलर न्यूज़ डिटेल स्क्रीन के TTS फीचर को संभालेगा
+// यह कंट्रोलर वैसा ही रहेगा
 class NewsDetailController extends GetxController {
   final FlutterTts flutterTts = FlutterTts();
   var isPlaying = false.obs;

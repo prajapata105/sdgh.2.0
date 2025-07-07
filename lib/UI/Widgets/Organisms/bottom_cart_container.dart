@@ -8,59 +8,87 @@ class BottomStickyContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ GetX CartService
     final cart = Get.find<CartService>();
 
-    return Obx(() => Align(
-      alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        width: double.infinity,
+    // Obx विजेट का इस्तेमाल करें ताकि यह कार्ट के बदलावों को सुन सके
+    return Obx(() {
+      // 👇====== शर्त यहाँ जोड़ी गई है ======👇
+      // अगर कार्ट में कोई आइटम नहीं है, तो कुछ भी न दिखाएं।
+      if (cart.totalItems < 1) {
+        return const SizedBox.shrink(); // यह एक खाली विजेट है
+      }
+
+      // 👇 अगर कार्ट में आइटम हैं, तो पूरा कंटेनर दिखाएं। 👇
+      return Align(
+        alignment: Alignment.bottomCenter,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+          width: double.infinity,
+          margin: const EdgeInsets.all(12.0), // मार्जिन ताकि यह किनारों से चिपका न रहे
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.greyWhiteColor,
-            borderRadius: BorderRadius.circular(10.0),
+              color: AppColors.primaryGreenColor, // कंटेनर का रंग बदला गया
+              borderRadius: BorderRadius.circular(12.0),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 10,
+                    spreadRadius: 2
+                )
+              ]
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${cart.totalItems} ITEM${cart.totalItems > 1 ? "S" : ""}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              // कीमत और आइटम की संख्या
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${cart.totalItems} ITEM${cart.totalItems > 1 ? "S" : ""}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 16
+                    ),
+                  ),
+                  Text(
+                    // grandTotal का इस्तेमाल
+                    '₹${cart.grandTotal.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white70,
+                        fontSize: 14
+                    ),
+                  ),
+                ],
               ),
+
+              // NEXT बटन
               TextButton(
                 onPressed: () {
-                  if (cart.totalItems > 0) {
-                    Get.toNamed('/cart'); // ✅ correct, if GetMaterialApp used
-                  } else {
-                    Get.snackbar(
-                      'Cart',
-                      'Please add at least one product to cart.',
-                      backgroundColor: Colors.red.shade600,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                  }
+                  Get.toNamed('/cart');
                 },
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)
                   ),
-                  backgroundColor: AppColors.primaryGreenColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 5),
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 10),
                 ),
-                child: const Text(
+                child: Text(
                   'NEXT',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
+                      color: AppColors.primaryGreenColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold
                   ),
                 ),
               )
             ],
           ),
         ),
-      ),
-    ));
+      );
+    });
   }
 }

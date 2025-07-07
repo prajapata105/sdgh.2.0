@@ -20,6 +20,7 @@ class HomeScreenSearchBar extends StatelessWidget {
       },
       child: Container(
         height: 45,
+        margin: EdgeInsets.all(5),
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: Colors.white,
