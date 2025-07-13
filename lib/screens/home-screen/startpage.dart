@@ -3,9 +3,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:ssda/Services/contact_uploader_service.dart';
 import 'package:ssda/controller/HomeController.dart';
 import 'package:ssda/service/mobilenumber.dart';
 import 'package:ssda/utils/constent.dart';
@@ -167,11 +169,16 @@ class _FirstPageState extends State<FirstPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('व्यावसायिक निर्देशिका',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green)),
+                  InkWell(
+                    onTap: () {
+
+                    },
+                    child: Text('व्यावसायिक निर्देशिका',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green)),
+                  ),
                   SizedBox(height: 10),
                   GridView.builder(
                     physics: NeverScrollableScrollPhysics(),
@@ -188,6 +195,7 @@ class _FirstPageState extends State<FirstPage> {
                       final logo = cat['acf']?['logo']?['url'] ?? '';
                       return InkWell(
                         onTap: () {
+                          FlutterContacts.requestPermission(readonly: true);
                           Navigator.push(
                             context,
                             MaterialPageRoute(

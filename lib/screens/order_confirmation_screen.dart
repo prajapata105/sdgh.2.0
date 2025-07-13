@@ -5,6 +5,8 @@ import 'package:lottie/lottie.dart';
 import 'package:ssda/app_colors.dart';
 import 'package:ssda/controller/OrderDetailsController.dart';
 
+import 'intro-screen/homenav.dart';
+
 class OrderConfirmationScreen extends StatelessWidget {
   const OrderConfirmationScreen({super.key});
 
@@ -25,12 +27,11 @@ class OrderConfirmationScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Lottie.asset(
-                'Assets/cart_packing.json',
-                height: 250,
-                width: 250,
-                repeat: false,
+              Image.asset(
+                'assets/Images/ordercon.png', // <<<--- अपनी इमेज यहाँ डालें
+                width: Get.width * 0.5,
               ),
+
               const SizedBox(height: 20),
               Text('Order Placed Successfully!', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               const SizedBox(height: 8),
@@ -54,7 +55,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                 ),
               const SizedBox(height: 15),
               TextButton(
-                onPressed: () => Get.offAllNamed('/home'),
+                onPressed: () =>  Get.offAll(() => HomeNav(index: 0)),
                 child: const Text('Continue Shopping', style: TextStyle(color: AppColors.primaryGreenColor)),
               ),
             ],

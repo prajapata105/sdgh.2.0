@@ -18,10 +18,7 @@ class NoInternetWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // अपनी इमेज का सही पाथ यहाँ दें
-            Image.asset(
-              'assets/imagesvg/5363928.jpg', // <<<--- अपनी इमेज यहाँ डालें
-              width: Get.width * 0.5,
-            ),
+
             SizedBox(height: Get.height * 0.03),
             const Text(
               'No internet connection',

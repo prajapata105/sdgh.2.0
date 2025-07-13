@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:ssda/screens/addBusinessscreen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/constent.dart';
 
@@ -261,33 +262,6 @@ class _MobileNumbersState extends State<MobileNumbers> {
   }
 
   void showAddDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('अपने व्यापार का विवरण जोड़ें'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: bnamecontroller, decoration: const InputDecoration(labelText: 'व्यापार का नाम')),
-              TextField(controller: onamecontroller, decoration: const InputDecoration(labelText: 'मालिक का नाम')),
-              TextField(controller: mobilecontroller, decoration: const InputDecoration(labelText: 'मोबाइल नंबर'), keyboardType: TextInputType.phone),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              Get.snackbar('धन्यवाद!', 'आपकी जानकारी 24 घंटे में जोड़ दी जाएगी।', snackPosition: SnackPosition.BOTTOM);
-              bnamecontroller.clear();
-              onamecontroller.clear();
-              mobilecontroller.clear();
-            },
-            child: const Text('Submit'),
-          ),
-        ],
-      ),
-    );
+    Get.to(() => AddBusinessScreen(initialCategoryId: widget.id));
   }
 }
