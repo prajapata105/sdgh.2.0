@@ -90,15 +90,15 @@ class CheckoutController extends GetxController {
                 Future.microtask(() => _initiateOrderCreation(paymentMethod: 'cod', paymentMethodTitle: 'Cash on Delivery'));
               },
             ),
-            ListTile(
-              leading: Icon(Icons.payment, color: Theme.of(context).colorScheme.secondary),
-              title: const Text('Pay Online (Razorpay)'),
-              onTap: () {
-                selectedPaymentMethod.value = 'razorpay';
-                Navigator.of(context).pop();
-                Future.microtask(() => _initiateRazorpayPayment());
-              },
-            ),
+            // ListTile(
+            //   leading: Icon(Icons.payment, color: Theme.of(context).colorScheme.secondary),
+            //   title: const Text('Pay Online (Razorpay)'),
+            //   onTap: () {
+            //     selectedPaymentMethod.value = 'razorpay';
+            //     Navigator.of(context).pop();
+            //     Future.microtask(() => _initiateRazorpayPayment());
+            //   },
+            // ),
           ],
         ),
       ),

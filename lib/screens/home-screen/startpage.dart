@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -135,23 +136,38 @@ class _FirstPageState extends State<FirstPage> {
               child: CarouselSlider.builder(
                 carouselController: _carouselController,
                 itemCount: _banners.length,
-                itemBuilder: (context, index, _) => Container(
-                  margin: EdgeInsets.all(5),
-                  width: w * 0.9,
-                  decoration: BoxDecoration(
-                    color: kWhiteColor,
-                    borderRadius: BorderRadius.circular(10),
-                    image: DecorationImage(
-                      image: NetworkImage(_banners[index]),
-                      fit: BoxFit.fill,
+                itemBuilder: (context, index, _) {
+                  // --- यहाँ से बदलाव शुरू ---
+                  return Container(
+                    margin: const EdgeInsets.all(5),
+                    width: w * 0.9,
+                    // ClipRRect का उपयोग करके कोनों को गोल करें
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        imageUrl: _banners[index],
+                        fit: BoxFit.fill,
+
+                        // (Recommended) लोडिंग के दौरान प्लेसहोल्डर दिखाएँ
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey.shade200,
+                        ),
+
+                        // (Recommended) एरर होने पर आइकॉन दिखाएँ
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                  // --- यहाँ बदलाव खत्म ---
+                },
                 options: CarouselOptions(
                   height: h * 0.23,
                   viewportFraction: 1,
                   autoPlay: _banners.length > 1,
-                  autoPlayInterval: Duration(seconds: 25),
+                  autoPlayInterval: const Duration(seconds: 25),
                 ),
               ),
             ),
@@ -195,7 +211,7 @@ class _FirstPageState extends State<FirstPage> {
                       final logo = cat['acf']?['logo']?['url'] ?? '';
                       return InkWell(
                         onTap: () {
-                          FlutterContacts.requestPermission(readonly: true);
+                          // FlutterContacts.requestPermission(readonly: true);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -220,7 +236,21 @@ class _FirstPageState extends State<FirstPage> {
                                   colors: [Color(0xffe3ffe7), Color(0xffd9e7ff)],
                                 ),
                               ),
-                              child: Image.network(logo, fit: BoxFit.contain, errorBuilder: (_,__,___) => Icon(Icons.business)),
+                              child: CachedNetworkImage(
+                                imageUrl: logo,
+                                fit: BoxFit.contain,
+
+                                // (Optional) इमेज लोड होते समय एक प्लेसहोल्डर दिखाएँ
+                                placeholder: (context, url) => Container(
+                                  alignment: Alignment.center,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                  ),
+                                ),
+
+                                // एरर होने पर यह विजेट दिखेगा
+                                errorWidget: (context, url, error) => Icon(Icons.business),
+                              ),
                             ),
                             SizedBox(height: 4),
                             Text(

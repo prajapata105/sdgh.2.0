@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ssda/models/category_model.dart';
 
@@ -11,7 +12,7 @@ class CategoryWidget extends StatelessWidget {
     return Column(
       children: [
         category.imageUrl != null
-            ? Image.network(category.imageUrl!, height: 50, width: 50)
+            ? CachedNetworkImage( imageUrl: category.imageUrl!, height: 50, width: 50)
             : const Icon(Icons.image_not_supported, size: 50),
         const SizedBox(height: 5),
         Text(

@@ -1,5 +1,6 @@
 // lib/UI/Widgets/Atoms/card_product.dart
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ssda/models/product_model.dart';
 import '../../../app_colors.dart';
@@ -32,7 +33,7 @@ class ProductCard extends StatelessWidget {
             Expanded( // इमेज को उपलब्ध जगह लेने दें
               child: Center(
                 child: product.image.isNotEmpty
-                    ? Image.network(product.image, fit: BoxFit.contain)
+                    ? CachedNetworkImage(imageUrl : product.image, fit: BoxFit.contain)
                     : const Placeholder(),
               ),
             ),

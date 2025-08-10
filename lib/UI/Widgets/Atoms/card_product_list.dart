@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:ssda/models/cart_item_model.dart';
 import 'package:ssda/services/cart_service.dart';
 import 'package:ssda/models/product_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 import '../Organisms/product_description_modal_opener.dart';
 
@@ -12,6 +14,7 @@ import '../Organisms/product_description_modal_opener.dart';
 class ProductCardForList extends StatelessWidget {
   final Product product;
   final CartService cartService = Get.find();
+  final HtmlUnescape unescape = HtmlUnescape();
 
   ProductCardForList({super.key, required this.product});
 
@@ -58,9 +61,23 @@ class ProductCardForList extends StatelessWidget {
           width: double.infinity,
           height: double.infinity,
           padding: EdgeInsets.all(Get.width * 0.0),
-          child: Image.network(
-            product.image.isNotEmpty ? product.image : 'https://i.imgur.com/sM38wD6.png',
+          child: CachedNetworkImage(
+            // URL चुनने का लॉजिक वैसा ही रहेगा
+            imageUrl: product.image.isNotEmpty
+                ? product.image
+                : 'https://i.imgur.com/sM38wD6.png',
             fit: BoxFit.contain,
+
+            // (Recommended) जब तक इमेज लोड हो रही है, एक प्लेसहोल्डर दिखाएँ
+            placeholder: (context, url) => Container(
+              color: Colors.grey[200], // हल्का ग्रे बैकग्राउंड
+            ),
+
+            // अगर किसी भी कारण से इमेज लोड नहीं हो पाती है
+            errorWidget: (context, url, error) => Icon(
+              Icons.broken_image,
+              color: Colors.grey,
+            ),
           ),
         ),
 
@@ -92,6 +109,7 @@ class ProductCardForList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Text(
+
                 product.weight!,
                 style: TextStyle(fontSize: Get.width * 0.03, color: Colors.grey.shade600),
               ),
@@ -116,12 +134,16 @@ class ProductCardForList extends StatelessWidget {
               ),
               SizedBox(width: Get.width * 0.02),
               if (product.onSale && product.regularPrice.isNotEmpty)
-                Text(
-                  'MRP ₹${product.regularPrice}',
-                  style: TextStyle(
-                    fontSize: Get.width * 0.03,
-                    decoration: TextDecoration.lineThrough,
-                    color: Colors.grey,
+                Expanded(
+                  child: Text(
+                    ' ₹${product.regularPrice}MRP',
+                    style: TextStyle(
+                      fontSize: Get.width * 0.03,
+                      decoration: TextDecoration.lineThrough,
+                      color: Colors.grey,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
             ],

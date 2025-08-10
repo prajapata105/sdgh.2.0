@@ -1,5 +1,5 @@
 // lib/screens/news_list_screen.dart
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -115,16 +115,38 @@ class _NewsListScreenState extends State<NewsListScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
-                    child: Image.network(
-                      imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
                       height: 220,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      errorBuilder: (c, o, s) => Image.network(
-                        _getFallbackImageUrl(index),
+
+                      // जब तक मुख्य इमेज लोड हो रही है, तब तक यह प्लेसहोल्डर दिखेगा
+                      placeholder: (context, url) => Container(
+                        height: 220,
+                        width: double.infinity,
+                        color: Colors.grey[200], // हल्का ग्रे रंग
+                      ),
+
+                      // अगर मुख्य imageUrl लोड करने में एरर आती है, तो यह विजेट चलेगा
+                      errorWidget: (context, url, error) => CachedNetworkImage(
+                        // अब fallback URL से इमेज लोड करने की कोशिश करें
+                        imageUrl: _getFallbackImageUrl(index),
                         height: 220,
                         width: double.infinity,
                         fit: BoxFit.cover,
+
+                        // अगर fallback इमेज भी लोड नहीं होती है, तो फाइनल एरर विजेट दिखाएँ
+                        errorWidget: (context, url, error) => Container(
+                          height: 220,
+                          width: double.infinity,
+                          color: Colors.grey[100],
+                          child: Icon(
+                            Icons.broken_image, // टूटी हुई इमेज का आइकॉन
+                            color: Colors.grey,
+                            size: 40,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -209,16 +231,34 @@ class _NewsListScreenState extends State<NewsListScreen> {
                   const SizedBox(width: 12),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
                       width: 100,
                       height: 80,
                       fit: BoxFit.cover,
-                      errorBuilder: (c, o, s) => Image.network(
-                        _getFallbackImageUrl(index + 5),
+
+                      // जब तक मुख्य इमेज लोड हो रही है, एक प्लेसहोल्डर दिखाएँ
+                      placeholder: (context, url) => Container(
+                        width: 100,
+                        height: 80,
+                        color: Colors.grey[200], // हल्का ग्रे बैकग्राउंड
+                      ),
+
+                      // अगर मुख्य इमेज लोड होने में एरर आए
+                      errorWidget: (context, url, error) => CachedNetworkImage(
+                        // तो fallback इमेज को लोड करें
+                        imageUrl: _getFallbackImageUrl(index + 5),
                         width: 100,
                         height: 80,
                         fit: BoxFit.cover,
+
+                        // अगर fallback इमेज भी फेल हो जाए, तो एक आइकॉन दिखाएँ
+                        errorWidget: (context, url, error) => Container(
+                          width: 100,
+                          height: 80,
+                          color: Colors.grey[100],
+                          child: Icon(Icons.image_not_supported_outlined, color: Colors.grey),
+                        ),
                       ),
                     ),
                   ),

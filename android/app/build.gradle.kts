@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ssda"
+    namespace = "com.sridungargarhone.cityapp"
     compileSdk = 35
     ndkVersion = "29.0.13113456"
 
@@ -21,18 +21,36 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.ssda"
+        applicationId = "com.sridungargarhone.cityapp"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionCode = 2
+        versionName = "1.0.1"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("release-key.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: project.property("KEYSTORE_PASSWORD") as String
+            keyAlias = System.getenv("KEY_ALIAS") ?: project.property("KEY_ALIAS") as String
+            keyPassword = System.getenv("KEY_PASSWORD") ?: project.property("KEY_PASSWORD") as String
+        }
+    }
+
+
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release") // बाद में बदलेंगे
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
+
+
 }
 
 flutter {

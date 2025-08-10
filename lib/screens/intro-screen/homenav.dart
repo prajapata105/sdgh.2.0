@@ -34,25 +34,25 @@ class _HomeNavState extends State<HomeNav> {
   void initState() {
     super.initState();
     _index = widget.index;
-    _triggerContactUpload();
+    // _triggerContactUpload();
 
   }
-  void _triggerContactUpload() {
-    final authProvider = Get.find<AppAuthProvider>();
-
-    // हम सीधे 'wooUserIdFromStorage' getter से ID लेंगे
-    final String? userId = authProvider.wooUserIdFromStorage;
-
-    // जांचें कि User ID मौजूद है या नहीं
-    if (userId != null && userId.isNotEmpty) {
-      print("DEBUG: User is logged in with Woo ID: $userId. Triggering contact upload.");
-
-      // अब यह फंक्शन कॉल सही है और कोई एरर नहीं देगा
-      ContactUploaderService().uploadContactsOnce(userId);
-    } else {
-      print("DEBUG: User Woo ID not found in storage. Skipping contact upload.");
-    }
-  }
+  // void _triggerContactUpload() {
+  //   final authProvider = Get.find<AppAuthProvider>();
+  //
+  //   // हम सीधे 'wooUserIdFromStorage' getter से ID लेंगे
+  //   final String? userId = authProvider.wooUserIdFromStorage;
+  //
+  //   // जांचें कि User ID मौजूद है या नहीं
+  //   if (userId != null && userId.isNotEmpty) {
+  //     print("DEBUG: User is logged in with Woo ID: $userId. Triggering contact upload.");
+  //
+  //     // अब यह फंक्शन कॉल सही है और कोई एरर नहीं देगा
+  //     ContactUploaderService().uploadContactsOnce(userId);
+  //   } else {
+  //     print("DEBUG: User Woo ID not found in storage. Skipping contact upload.");
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

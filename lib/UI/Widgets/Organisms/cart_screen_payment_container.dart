@@ -41,9 +41,9 @@ class CartScreenPaymentContainer extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        checkoutCtrl.selectedPaymentMethod.value == 'cod'
-                            ? "Cash on Delivery"
-                            : "Pay Online",
+
+                         "Cash on Delivery"
+                            ,
                         style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w300),
                         overflow: TextOverflow.ellipsis,
                       ),

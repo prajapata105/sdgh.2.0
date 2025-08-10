@@ -92,7 +92,7 @@ class CartService extends GetxController {
 
   double get discount => appliedCoupon.value?.amount?.toDouble() ?? 0.0;
 
-  double get deliveryCharge => subtotal < 200 && subtotal > 0 ? 1.0 : 0.0;
+  double get deliveryCharge => subtotal < 200 && subtotal > 0 ? 20.0 : 0.0;
 
   double get grandTotal {
     final value = subtotal - discount + deliveryCharge;

@@ -109,9 +109,9 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
               _buildTextField(label: "Nearby landmark (optional)", controller: landmarkCtrl, isOptional: true),
 
               // City, State, Pincode - ये जरूरी हैं
-              _buildTextField(label: "City *", controller: cityCtrl),
-              _buildTextField(label: "Pincode *", controller: pincodeCtrl, keyboardType: TextInputType.number),
-              _buildTextField(label: "State *", controller: stateCtrl),
+              // _buildTextField(label: "City *", controller: cityCtrl),
+              // _buildTextField(label: "Pincode *", controller: pincodeCtrl, keyboardType: TextInputType.number),
+              // _buildTextField(label: "State *", controller: stateCtrl),
 
               const SizedBox(height: 16),
               const Divider(),

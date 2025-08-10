@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -38,12 +39,27 @@ class HomeScreenCarousel extends StatelessWidget {
 
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      banner.imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: banner.imageUrl,
                       fit: BoxFit.fill,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.broken_image, size: 50, color: Colors.grey);
-                      },
+
+                      // (Optional but Recommended) इमेज लोड होते समय एक प्लेसहोल्डर दिखाएँ
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey.shade200, // हल्का ग्रे बैकग्राउंड
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+
+                      // अगर इमेज लोड होने में कोई एरर आए
+                      errorWidget: (context, url, error) => const Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Colors.grey
+                      ),
                     ),
                   ),
                 ),

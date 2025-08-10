@@ -1,20 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ssda/models/category_model.dart';
 import 'package:ssda/services/category_service.dart';
 import 'package:ssda/screens/products_screen.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 class HomeScreenCateogoryWidget extends StatefulWidget {
   const HomeScreenCateogoryWidget({super.key});
-
   @override
   State<HomeScreenCateogoryWidget> createState() => _HomeScreenCateogoryWidgetState();
 }
 
 class _HomeScreenCateogoryWidgetState extends State<HomeScreenCateogoryWidget> {
   late Future<List<Category>> _categoriesFuture;
-
   @override
   void initState() {
     super.initState();
@@ -44,7 +44,7 @@ class _HomeScreenCateogoryWidgetState extends State<HomeScreenCateogoryWidget> {
               crossAxisSpacing: 12.0,
               childAspectRatio: 0.5, // आपका पसंदीदा साइज़
             ),
-            itemCount: categories.length > 8 ? 8 : categories.length,
+            itemCount: categories.length,
             itemBuilder: (BuildContext context, int index) {
               return _CategoryIcon(category: categories[index]);
             },
@@ -100,6 +100,8 @@ class _CategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final HtmlUnescape unescape = HtmlUnescape();
+
     return InkWell(
       onTap: () {
         Get.to(() => ProductsScreen(
@@ -123,11 +125,26 @@ class _CategoryIcon extends StatelessWidget {
                   ),
                   border: Border.all(color: Colors.grey.shade200, width: 0.5)
               ),
-              child: Image.network(
-                category.imageUrl ?? '',
+              child: CachedNetworkImage(
+                // अगर imageUrl null है तो एक खाली स्ट्रिंग पास करें,
+                // जिसे errorWidget संभाल लेगा।
+                imageUrl: category.imageUrl ?? '',
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.category_outlined, color: Colors.grey),
+
+                // (Recommended) जब तक इमेज लोड हो रही है, यह दिखाएँ
+                placeholder: (context, url) => Container(
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                    color: Colors.grey.shade200,
+                  ),
+                ),
+
+                // अगर इमेज लोड होने में कोई एरर आए (या URL खाली हो)
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.category_outlined,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),
@@ -136,7 +153,7 @@ class _CategoryIcon extends StatelessWidget {
           // <<<--- बदलाव यहाँ: टेक्स्ट को Flexible में लपेटा गया ---<<<
           Flexible(
             child: Text(
-              category.name,
+              unescape.convert(category.name),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

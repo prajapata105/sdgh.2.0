@@ -27,10 +27,7 @@ class OrderConfirmationScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/Images/ordercon.png', // <<<--- अपनी इमेज यहाँ डालें
-                width: Get.width * 0.5,
-              ),
+
 
               const SizedBox(height: 20),
               Text('Order Placed Successfully!', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
@@ -51,7 +48,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     // अब हमें आर्गुमेंट्स भेजने की जरूरत नहीं है, क्योंकि OrderDetailsController में डेटा पहले से ही है
                     Get.toNamed('/order');
                   },
-                  child: const Text('View Order Details'),
+                  child: const Text('View Order Details', style:  TextStyle(color: Colors.white),),
                 ),
               const SizedBox(height: 15),
               TextButton(
