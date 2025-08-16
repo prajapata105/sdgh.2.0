@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:html/parser.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ssda/controller/news_controller.dart';
 import 'package:ssda/models/news_article_model.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NewsDetailScreen extends StatelessWidget {
   final NewsArticle article;
@@ -15,6 +17,15 @@ class NewsDetailScreen extends StatelessWidget {
     final document = parse(htmlString);
     final String? parsedString = document.body?.text;
     return parsedString ?? '';
+  }
+  void _launchWhatsAppGroup() async {
+    final Uri groupLink = Uri.parse('https://chat.whatsapp.com/HHLw32vFTooBeciE4ygaeL');
+    try {
+      // LaunchMode.externalApplication सुनिश्चित करता है कि यह व्हाट्सएप ऐप में खुले, ब्राउज़र में नहीं।
+      await launchUrl(groupLink, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      Get.snackbar('Error', 'Could not open the link.');
+    }
   }
 
   @override
@@ -136,7 +147,15 @@ class NewsDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _launchWhatsAppGroup, // बटन क्लिक पर यह फंक्शन कॉल होगा
+        icon: const Icon(FontAwesomeIcons.whatsapp),
+        label: const Text('ग्रुप से जुड़ें'),
+        backgroundColor: Colors.green.shade700,
+        foregroundColor: Colors.white,
+      ),
     );
+
   }
 
   Widget _listenToNewsButton(NewsDetailController detailCtrl) {
@@ -164,12 +183,14 @@ class NewsDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              detailCtrl.isPlaying.value ? 'Listening...' : 'Listen to this news',
+              detailCtrl.isPlaying.value ? 'खबर बंद करने के लिए बटन दबाएँ। ' : 'खबर सुनने के लिए बटन दबाएँ।',
               style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold),
             ),
           ],
         ),
       ),
     ));
+
   }
+
 }

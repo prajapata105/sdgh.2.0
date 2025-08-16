@@ -12,11 +12,37 @@ import 'package:ssda/Services/contact_uploader_service.dart';
 import 'package:ssda/controller/HomeController.dart';
 import 'package:ssda/service/mobilenumber.dart';
 import 'package:ssda/utils/constent.dart';
+import 'package:upgrader/upgrader.dart';
+import '../../UI/Widgets/Atoms/MandiPriceScreen.dart';
 import '../intro-screen/homenav.dart';
 import 'package:ssda/ui/widgets/organisms/home_screen_category_builder.dart';
 import 'package:ssda/UI/Widgets/Organisms/category_with_products.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'SearchScreen.dart';
 
+class HindiUpgraderMessages extends UpgraderMessages {
+  @override
+  final String code = 'hi';
+
+  @override
+  String get title => 'नया अपडेट उपलब्ध है!';
+
+  @override
+  String get body => 'बेहतर अनुभव के लिए ऐप का नया संस्करण डाउनलोड करें।';
+
+  @override
+  String get prompt => 'क्या आप ऐप को अभी अपडेट करना चाहते हैं?';
+
+  @override
+  String get buttonTitleUpdate => 'अभी अपडेट करें';
+
+  @override
+  String get buttonTitleLater => 'बाद में';
+
+  @override
+  String get buttonTitleIgnore => 'अनदेखा करें';
+}
 class FirstPage extends StatefulWidget {
   @override
   State<FirstPage> createState() => _FirstPageState();
@@ -88,338 +114,361 @@ class _FirstPageState extends State<FirstPage> {
       print('Error fetching business categories: $e');
     }
   }
+  final upgrader = Upgrader(
+    // 'playStoreId' वाली गलत लाइन हटा दी गई है।
 
+    // पॉप-अप के मैसेज को हिंदी में बदलें
+    messages: UpgraderMessages(
+      code: 'hi',
+
+    ),
+  );
   @override
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: kBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: kWhiteColor,
-        elevation: 0,
-        title: Text(
-          'श्रीडूँगरगढ़ One',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: kblue,
-            fontSize: 22,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-              decoration: BoxDecoration(
-                border: Border.all(width: 1.5, color: kblue),
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Icon(Icons.person, color: Theme.of(context).iconTheme.color),
-            ),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/profile');
-            },
-          ),
-        ],
+    return UpgradeAlert(
+      upgrader: Upgrader(
+        // हमारी हिंदी मैसेज वाली क्लास यहाँ डालें
+        messages: HindiUpgraderMessages(),
+        // डीबग करते समय पॉप-अप देखने के लिए इसे true करें
+        debugLogging: false,
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-      // 👇 बॉडी को CustomScrollView से बनाया गया है
-          : CustomScrollView(
-        slivers: [
-          // 👇 हर सामान्य विजेट को SliverToBoxAdapter में रैप किया गया है
-
-          // 1. Banner Slider
-          if (_banners.isNotEmpty)
-            SliverToBoxAdapter(
-              child: CarouselSlider.builder(
-                carouselController: _carouselController,
-                itemCount: _banners.length,
-                itemBuilder: (context, index, _) {
-                  // --- यहाँ से बदलाव शुरू ---
-                  return Container(
-                    margin: const EdgeInsets.all(5),
-                    width: w * 0.9,
-                    // ClipRRect का उपयोग करके कोनों को गोल करें
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: _banners[index],
-                        fit: BoxFit.fill,
-
-                        // (Recommended) लोडिंग के दौरान प्लेसहोल्डर दिखाएँ
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey.shade200,
+      child: Scaffold(
+        backgroundColor: kBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: kWhiteColor,
+          elevation: 0,
+          title: Text(
+            'श्रीडूँगरगढ़ One',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: kblue,
+              fontSize: 22,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: Container(
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1.5, color: kblue),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Icon(Icons.person, color: Theme.of(context).iconTheme.color),
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/profile');
+              },
+            ),
+          ],
+        ),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+        // 👇 बॉडी को CustomScrollView से बनाया गया है
+            : CustomScrollView(
+          slivers: [
+            // 👇 हर सामान्य विजेट को SliverToBoxAdapter में रैप किया गया है
+      
+            // 1. Banner Slider
+            if (_banners.isNotEmpty)
+              SliverToBoxAdapter(
+                child: CarouselSlider.builder(
+                  carouselController: _carouselController,
+                  itemCount: _banners.length,
+                  itemBuilder: (context, index, _) {
+                    // --- यहाँ से बदलाव शुरू ---
+                    return Container(
+                      margin: const EdgeInsets.all(5),
+                      width: w * 0.9,
+                      // ClipRRect का उपयोग करके कोनों को गोल करें
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: _banners[index],
+                          fit: BoxFit.fill,
+      
+                          // (Recommended) लोडिंग के दौरान प्लेसहोल्डर दिखाएँ
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey.shade200,
+                          ),
+      
+                          // (Recommended) एरर होने पर आइकॉन दिखाएँ
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                          ),
                         ),
+                      ),
+                    );
+                    // --- यहाँ बदलाव खत्म ---
+                  },
+                  options: CarouselOptions(
+                    height: h * 0.23,
+                    viewportFraction: 1,
+                    autoPlay: _banners.length > 1,
+                    autoPlayInterval: const Duration(seconds: 25),
+                  ),
+                ),
+              ),
+      
+            // 2. Business Directory (Mobile Numbers) Section
+            SliverToBoxAdapter(
+              child: Container(
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(8, 16, 8, 0),
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: kWhiteColor,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
 
-                        // (Recommended) एरर होने पर आइकॉन दिखाएँ
-                        errorWidget: (context, url, error) => const Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
+                        Text('व्यावसायिक निर्देशिका',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green)),
+                        IconButton(
+                          icon: const Icon(Icons.search, color: Colors.green),
+                          onPressed: () {
+                           Get.to( SearchScreen());
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    GridView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: visibleBusinessCategories.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 4,
+                        childAspectRatio: 0.7,
+                      ),
+                      itemBuilder: (context, index) {
+                        final cat = visibleBusinessCategories[index];
+                        final name = cat['name'];
+                        final logo = cat['acf']?['logo']?['url'] ?? '';
+                        return InkWell(
+                          onTap: () {
+                            // FlutterContacts.requestPermission(readonly: true);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MobileNumbers(
+                                  id: cat['id'].toString(),
+                                  cate: cat['name'],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: h * 0.085,
+                                width: w * 0.177,
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xffe3ffe7), Color(0xffd9e7ff)],
+                                  ),
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl: logo,
+                                  fit: BoxFit.contain,
+      
+                                  // (Optional) इमेज लोड होते समय एक प्लेसहोल्डर दिखाएँ
+                                  placeholder: (context, url) => Container(
+                                    alignment: Alignment.center,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                    ),
+                                  ),
+      
+                                  // एरर होने पर यह विजेट दिखेगा
+                                  errorWidget: (context, url, error) => Icon(Icons.business),
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: h * 0.018,
+                                    fontWeight: FontWeight.bold,
+                                    color: ksubprime.withOpacity(0.8)),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _isBusinessListExpanded = !_isBusinessListExpanded;
+                          visibleBusinessCategories = _isBusinessListExpanded
+                              ? allBusinessCategories
+                              : allBusinessCategories.take(8).toList();
+                        });
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        margin: EdgeInsets.only(top: 12),
+                        height: h * 0.05,
+                        width: w,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: kGreyColor),
+                          gradient: LinearGradient(colors: [Color(0xffe3ffe7), Color(0xffd9e7ff)]),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _isBusinessListExpanded ? "बंद करें" : 'और देखें',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ksubprime),
+                            ),
+                            Icon(_isBusinessListExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down)
+                          ],
                         ),
                       ),
                     ),
-                  );
-                  // --- यहाँ बदलाव खत्म ---
-                },
-                options: CarouselOptions(
-                  height: h * 0.23,
-                  viewportFraction: 1,
-                  autoPlay: _banners.length > 1,
-                  autoPlayInterval: const Duration(seconds: 25),
+                  ],
                 ),
               ),
             ),
-
-          // 2. Business Directory (Mobile Numbers) Section
-          SliverToBoxAdapter(
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: kWhiteColor,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () {
-
-                    },
-                    child: Text('व्यावसायिक निर्देशिका',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green)),
-                  ),
-                  SizedBox(height: 10),
-                  GridView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: visibleBusinessCategories.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 4,
-                      childAspectRatio: 0.7,
-                    ),
-                    itemBuilder: (context, index) {
-                      final cat = visibleBusinessCategories[index];
-                      final name = cat['name'];
-                      final logo = cat['acf']?['logo']?['url'] ?? '';
-                      return InkWell(
-                        onTap: () {
-                          // FlutterContacts.requestPermission(readonly: true);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MobileNumbers(
-                                id: cat['id'].toString(),
-                                cate: cat['name'],
-                              ),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: h * 0.085,
-                              width: w * 0.177,
-                              padding: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: LinearGradient(
-                                  colors: [Color(0xffe3ffe7), Color(0xffd9e7ff)],
-                                ),
-                              ),
-                              child: CachedNetworkImage(
-                                imageUrl: logo,
-                                fit: BoxFit.contain,
-
-                                // (Optional) इमेज लोड होते समय एक प्लेसहोल्डर दिखाएँ
-                                placeholder: (context, url) => Container(
-                                  alignment: Alignment.center,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.0,
-                                  ),
-                                ),
-
-                                // एरर होने पर यह विजेट दिखेगा
-                                errorWidget: (context, url, error) => Icon(Icons.business),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              name,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: h * 0.018,
-                                  fontWeight: FontWeight.bold,
-                                  color: ksubprime.withOpacity(0.8)),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _isBusinessListExpanded = !_isBusinessListExpanded;
-                        visibleBusinessCategories = _isBusinessListExpanded
-                            ? allBusinessCategories
-                            : allBusinessCategories.take(8).toList();
-                      });
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(top: 12),
-                      height: h * 0.05,
-                      width: w,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: kGreyColor),
-                        gradient: LinearGradient(colors: [Color(0xffe3ffe7), Color(0xffd9e7ff)]),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _isBusinessListExpanded ? "बंद करें" : 'और देखें',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ksubprime),
-                          ),
-                          Icon(_isBusinessListExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down)
-                        ],
+      
+            // 3. Product Categories Section
+            SliverToBoxAdapter(
+              child: Container(
+                width: double.infinity,
+                margin:  EdgeInsets.all(6.0),
+      
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                    color: kWhiteColor,
+                    borderRadius: BorderRadius.circular(30)
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        'उत्पाद श्रेणियाँ',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ksubprime),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 10),
+                    HomeScreenCateogoryWidget(),
+                  ],
+                ),
               ),
             ),
-          ),
-
-          // 3. Product Categories Section
-          SliverToBoxAdapter(
-            child: Container(
-              width: double.infinity,
-              margin:  EdgeInsets.all(6.0),
-
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                  color: kWhiteColor,
-                  borderRadius: BorderRadius.circular(30)
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      'उत्पाद श्रेणियाँ',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ksubprime),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  HomeScreenCateogoryWidget(),
-                ],
-              ),
-            ),
-          ),
-
-          // 4. Dynamic Sections from HomeController
-          // 👇 यहाँ Obx को सीधे स्लाइवर लिस्ट में इस्तेमाल किया गया है
-          Obx(() {
-            // क्योंकि homeController.homeSections एक लिस्ट है, हमें इसे एक-एक करके देखना होगा
-            // लेकिन यहाँ हम मान रहे हैं कि यह एक ही सेक्शन दिखाएगा या फिर हमें लूप करना होगा
-            if (homeController.homeSections.isEmpty) {
-              return const SliverToBoxAdapter(child: SizedBox.shrink());
-            }
-
-            // हम सिर्फ एक उदाहरण ले रहे हैं, आपको शायद यहाँ लूप लगाना पड़े
-            final section = homeController.homeSections.first; // Example for one section
-
-            if (section.isLoading.value) {
-              return SliverToBoxAdapter(
-                child: Center(child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: CircularProgressIndicator(),
-                )),
+      
+            // 4. Dynamic Sections from HomeController
+            // 👇 यहाँ Obx को सीधे स्लाइवर लिस्ट में इस्तेमाल किया गया है
+            Obx(() {
+              // क्योंकि homeController.homeSections एक लिस्ट है, हमें इसे एक-एक करके देखना होगा
+              // लेकिन यहाँ हम मान रहे हैं कि यह एक ही सेक्शन दिखाएगा या फिर हमें लूप करना होगा
+              if (homeController.homeSections.isEmpty) {
+                return const SliverToBoxAdapter(child: SizedBox.shrink());
+              }
+      
+              // हम सिर्फ एक उदाहरण ले रहे हैं, आपको शायद यहाँ लूप लगाना पड़े
+              final section = homeController.homeSections.first; // Example for one section
+      
+              if (section.isLoading.value) {
+                return SliverToBoxAdapter(
+                  child: Center(child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  )),
+                );
+              }
+              if (section.products.isEmpty) {
+                return const SliverToBoxAdapter(child: SizedBox.shrink());
+              }
+              // CatgorywithProducts अब सीधे यहाँ इस्तेमाल किया जा सकता है क्योंकि यह एक Sliver है
+              // और हम CustomScrollView के अंदर हैं।
+              return CatgorywithProducts(
+                title: section.title,
+                products: section.products,
+                categoryId: section.type == 'category' ? int.tryParse(section.value) : null,
+                categoryName: section.title,
               );
-            }
-            if (section.products.isEmpty) {
-              return const SliverToBoxAdapter(child: SizedBox.shrink());
-            }
-            // CatgorywithProducts अब सीधे यहाँ इस्तेमाल किया जा सकता है क्योंकि यह एक Sliver है
-            // और हम CustomScrollView के अंदर हैं।
-            return CatgorywithProducts(
-              title: section.title,
-              products: section.products,
-              categoryId: section.type == 'category' ? int.tryParse(section.value) : null,
-              categoryName: section.title,
-            );
-          }),
-
-
-          // 5. Bottom Buttons
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => Get.to(() => HomeNav(index: 1)),
-                      child: Container(
-                        height: h * 0.08,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: [Color(0xffD16BA5), Color(0xff86A8E7), Color(0xff5FFBF1)],
+            }),
+      
+      
+            // 5. Bottom Buttons
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => Get.to(() => HomeNav(index: 1)),
+                        child: Container(
+                          height: h * 0.08,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: LinearGradient(
+                              colors: [Color(0xffD16BA5), Color(0xff86A8E7), Color(0xff5FFBF1)],
+                            ),
                           ),
-                        ),
-                        child: Center(
-                          child: Text('ताज़ा ख़बर देखे',
-                              style: TextStyle(
-                                  color: kWhiteColor,
-                                  fontSize: h * 0.03,
-                                  fontWeight: FontWeight.bold)),
+                          child: Center(
+                            child: Text('ताज़ा ख़बर देखे',
+                                style: TextStyle(
+                                    color: kWhiteColor,
+                                    fontSize: h * 0.03,
+                                    fontWeight: FontWeight.bold)),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => Get.to(() => HomeNav(index: 3)),
-                      child: Container(
-                        height: h * 0.08,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: [Color(0xffD16BA5), Color(0xff86A8E7), Color(0xff5FFBF1)],
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => Get.to(() => HomeNav(index: 3)),
+                        child: Container(
+                          height: h * 0.08,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: LinearGradient(
+                              colors: [Color(0xffD16BA5), Color(0xff86A8E7), Color(0xff5FFBF1)],
+                            ),
                           ),
-                        ),
-                        child: Center(
-                          child: Text('आज का मंडी भाव',
-                              style: TextStyle(
-                                  color: kWhiteColor,
-                                  fontSize: h * 0.03,
-                                  fontWeight: FontWeight.bold)),
+                          child: Center(
+                            child: Text('आज का मंडी भाव',
+                                style: TextStyle(
+                                    color: kWhiteColor,
+                                    fontSize: h * 0.03,
+                                    fontWeight: FontWeight.bold)),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

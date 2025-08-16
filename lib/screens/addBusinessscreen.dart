@@ -3,17 +3,23 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../utils/constent.dart'; // आपके प्रोजेक्ट के कलर्स और कांस्टेंट्स
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
-class AddBusinessScreen extends StatefulWidget {
+import '../../utils/constent.dart';
+import 'ShareAndSubmitScreen.dart'; // मान लिया गया कि यह फाइल मौजूद है
+
+// --- पहला चरण: व्यवसाय विवरण भरें ---
+class AddBusinessDetailsScreen extends StatefulWidget {
   final String initialCategoryId;
-  const AddBusinessScreen({Key? key, required this.initialCategoryId}) : super(key: key);
+  final String phoneNumber; // लॉगिन से मिला नंबर
+  const AddBusinessDetailsScreen({Key? key, required this.initialCategoryId, required this.phoneNumber}) : super(key: key);
 
   @override
-  _AddBusinessScreenState createState() => _AddBusinessScreenState();
+  _AddBusinessDetailsScreenState createState() => _AddBusinessDetailsScreenState();
 }
 
-class _AddBusinessScreenState extends State<AddBusinessScreen> {
+class _AddBusinessDetailsScreenState extends State<AddBusinessDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _bnameController = TextEditingController();
   final _onameController = TextEditingController();
@@ -22,11 +28,11 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
   List<Map<String, dynamic>> _categories = [];
   Map<String, dynamic>? _selectedCategory;
   bool _isLoadingCategories = true;
-  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
+    _mobileController.text = widget.phoneNumber;
     _fetchCategories();
   }
 
@@ -37,9 +43,6 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _categories = data.map((cat) => {'id': cat['id'], 'name': cat['name']}).toList();
-
-        // --- यहाँ बदलाव किया गया है ---
-        // firstWhere को firstWhereOrNull से बदला गया है ताकि एरर न आए
         _selectedCategory = _categories.firstWhereOrNull((cat) => cat['id'].toString() == widget.initialCategoryId);
       }
     } catch (e) {
@@ -51,41 +54,15 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
     }
   }
 
-  Future<void> _submitForm() async {
+  void _navigateToShareScreen() {
     if (_formKey.currentState!.validate() && _selectedCategory != null) {
-      setState(() => _isSubmitting = true);
-      try {
-        final url = Uri.parse('https://sridungargarhone.com/wp-json/custom/v1/submit-business');
-        final response = await http.post(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Secret-Key': 'aSdsfrdsaaasdsd@2025!#', // आपकी गुप्त कुंजी
-          },
-          body: json.encode({
-            'business_name': _bnameController.text,
-            'owner_name': _onameController.text,
-            'mobile_number': _mobileController.text,
-            'category_id': _selectedCategory!['id'],
-          }),
-        );
-
-        if (response.statusCode == 200) {
-          Get.back(); // वापस पिछली स्क्रीन पर जाएँ
-          Get.snackbar('धन्यवाद!', 'आपकी जानकारी 24 घंटे में जोड़ दी जाएगी।', snackPosition: SnackPosition.BOTTOM);
-        } else {
-          final errorData = json.decode(response.body);
-          Get.snackbar('Error', errorData['message'] ?? 'Something went wrong');
-        }
-      } catch (e) {
-        Get.snackbar('Error', 'An error occurred: $e');
-      } finally {
-        if (mounted) {
-          setState(() => _isSubmitting = false);
-        }
-      }
-    } else if (_selectedCategory == null) {
-      Get.snackbar('Error', 'Please select a category');
+      final businessData = {
+        'business_name': _bnameController.text,
+        'owner_name': _onameController.text,
+        'mobile_number': _mobileController.text,
+        'category_id': _selectedCategory!['id'],
+      };
+      Get.to(() => ShareAndSubmitScreen(businessData: businessData));
     }
   }
 
@@ -101,7 +78,7 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: kTitleColor),
         ),
         title: Text(
-          'Add Your Business',
+          'Add Business',
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: kBlackColor, fontSize: 22),
         ),
       ),
@@ -115,11 +92,33 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(controller: _bnameController, decoration: const InputDecoration(labelText: 'व्यापार का नाम'), validator: (v) => v!.isEmpty ? 'यह ज़रूरी है' : null),
+              // --- इंडिकेटर (Stepper) ---
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildStepIndicator(0, 'विवरण'),
+                  _buildStepDivider(0),
+                  _buildStepIndicator(1, 'शेयर'),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              TextFormField(
+                  controller: _bnameController,
+                  decoration: const InputDecoration(labelText: 'व्यापार का नाम'),
+                  validator: (v) => v!.isEmpty ? 'यह ज़रूरी है' : null),
               const SizedBox(height: 16),
-              TextFormField(controller: _onameController, decoration: const InputDecoration(labelText: 'मालिक का नाम'), validator: (v) => v!.isEmpty ? 'यह ज़रूरी है' : null),
+              TextFormField(
+                  controller: _onameController,
+                  decoration: const InputDecoration(labelText: 'मालिक का नाम'),
+                  validator: (v) => v!.isEmpty ? 'यह ज़रूरी है' : null),
               const SizedBox(height: 16),
-              TextFormField(controller: _mobileController, decoration: const InputDecoration(labelText: 'मोबाइल नंबर'), keyboardType: TextInputType.phone, validator: (v) => v!.isEmpty ? 'यह ज़रूरी है' : null),
+              TextFormField(
+                controller: _mobileController,
+                decoration: const InputDecoration(labelText: 'मोबाइल नंबर'),
+                keyboardType: TextInputType.phone,
+                readOnly: true,
+              ),
               const SizedBox(height: 16),
               DropdownButtonFormField<Map<String, dynamic>>(
                 value: _selectedCategory,
@@ -135,16 +134,46 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
                 decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
               const SizedBox(height: 32),
-              _isSubmitting
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                onPressed: _submitForm,
-                child: const Text('Submit for Review'),
+              ElevatedButton(
+                onPressed: _navigateToShareScreen,
+                child: const Text('अगला'),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildStepIndicator(int step, String label) {
+    bool isActive = 0 == step;
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 12,
+          backgroundColor: isActive ? kPrimaryColor : Colors.grey.shade400,
+          child: Text(
+            '${step + 1}',
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: isActive ? kPrimaryColor : Colors.grey.shade600,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepDivider(int step) {
+    return Container(
+      width: 60,
+      height: 2,
+      color: 1 > step ? kPrimaryColor : Colors.grey.shade400,
     );
   }
 }

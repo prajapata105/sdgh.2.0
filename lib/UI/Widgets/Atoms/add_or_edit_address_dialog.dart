@@ -103,10 +103,10 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
               const SizedBox(height: 24),
 
               // बिल्डिंग, फ्लोर आदि के लिए फील्ड्स
-              _buildTextField(label: "Office / Building name *", controller: officeBuildingCtrl),
+              _buildTextField(label: "कार्यालय/घर का नाम *", controller: officeBuildingCtrl),
               _buildTextField(label: "Floor *", controller: floorCtrl),
               _buildTextField(label: "Tower / Wing (optional)", controller: towerCtrl, isOptional: true),
-              _buildTextField(label: "Nearby landmark (optional)", controller: landmarkCtrl, isOptional: true),
+              _buildTextField(label: "आस-पास कोई प्रसिद्ध स्थान (optional)", controller: landmarkCtrl, isOptional: true),
 
               // City, State, Pincode - ये जरूरी हैं
               // _buildTextField(label: "City *", controller: cityCtrl),
@@ -118,14 +118,14 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
               const SizedBox(height: 16),
 
               const Text(
-                "Add Receiver's Details",
+                "प्राप्तकर्ता की जानकारी जोड़ें",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
 
               // रिसीवर के नाम और फोन के लिए फील्ड्स
-              _buildTextField(label: "Receiver's name *", controller: receiverNameCtrl),
-              _buildTextField(label: "Receiver's phone *", controller: receiverPhoneCtrl, keyboardType: TextInputType.phone),
+              _buildTextField(label: "प्राप्तकर्ता का नाम *", controller: receiverNameCtrl),
+              _buildTextField(label: "फ़ोन नंबर *", controller: receiverPhoneCtrl, keyboardType: TextInputType.phone,),
 
               const SizedBox(height: 24),
             ],
@@ -189,6 +189,7 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
   }
 
   // टॉप पर दिखने वाला इन्फो बैनर
+
   Widget _buildInfoBanner() {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -198,19 +199,18 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: Colors.red[700]),
+          Icon(Icons.delivery_dining, color: Colors.red[700]),
           const SizedBox(width: 12),
           const Expanded(
             child: Text(
-              "Please check address details for a hassle free delivery experience",
-              style: TextStyle(color: Colors.red),
+              "डिलीवरी केवल श्रीडूंगरगढ़ में उपलब्ध है",
+
             ),
           ),
         ],
       ),
     );
   }
-
   // नीचे वाला सेव बटन
   Widget _buildSaveButton() {
     return Container(

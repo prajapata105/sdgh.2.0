@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -262,6 +263,8 @@ class _MobileNumbersState extends State<MobileNumbers> {
   }
 
   void showAddDialog() {
-    Get.to(() => AddBusinessScreen(initialCategoryId: widget.id));
+    final user = FirebaseAuth.instance.currentUser;
+    final String phoneNumbers = user?.phoneNumber ?? '';
+    Get.to(() => AddBusinessDetailsScreen(initialCategoryId: widget.id, phoneNumber: phoneNumbers,));
   }
 }
